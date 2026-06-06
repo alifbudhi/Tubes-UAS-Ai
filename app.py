@@ -67,7 +67,7 @@ with c2:
     )
     year = st.selectbox(
         "Tingkat studi",
-        ["1", "2", "3", "4", "Graduate"]
+        ["Freshman", "Sophomore", "Junior", "Senior", "Graduate"]
     )
 c3, c4, c5 = st.columns(3)
 with c3:
