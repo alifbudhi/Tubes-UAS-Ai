@@ -1,39 +1,100 @@
 
-import streamlit as st          
-import pandas as pd             
-import numpy as np              
-import joblib        
+import streamlit as st
+import pandas as pd
+import numpy as np
+import joblib
 
 st.set_page_config(
-    page_title="AI Burnout Risk Predictor Kelompok 3",   
-    page_icon="🍌",                            
-    layout="centered",                          
+    page_title="AI Burnout Risk Predictor Kelompok 3",
+    page_icon="🌈",
+    layout="centered",
 )
 
-@st.cache_resource 
+# ===== BACKGROUND RAINBOW + EMOJI BERGERAK =====
+st.markdown("""
+<style>
+/* Latar belakang rainbow lembut yang bergerak halus */
+.stApp {
+    background: linear-gradient(-45deg,
+        #ffd1dc, #ffe9c7, #fff7c2, #d4f5d4, #c7e9ff, #e0d1ff, #ffd1f0);
+    background-size: 400% 400%;
+    animation: rainbowShift 18s ease infinite;
+}
+@keyframes rainbowShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+/* Panel gelap semi-transparan di belakang konten agar teks tetap terbaca */
+.stApp .block-container {
+    background: rgba(15, 23, 42, 0.80);
+    padding: 2rem 2.5rem;
+    border-radius: 18px;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+/* Pastikan teks tetap terang di atas panel gelap */
+.stApp .block-container,
+.stApp .block-container p,
+.stApp .block-container label,
+.stApp .block-container h1,
+.stApp .block-container h2,
+.stApp .block-container h3,
+.stApp .block-container li {
+    color: #f1f5f9 !important;
+}
+/* Emoji yang memantul (bouncing) */
+.emoji-bounce {
+    display: inline-block;
+    animation: bounce 1.2s ease infinite;
+    font-size: 2.4rem;
+}
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-14px); }
+}
+/* Emoji yang bergoyang (wiggle) */
+.emoji-wiggle {
+    display: inline-block;
+    animation: wiggle 1.6s ease-in-out infinite;
+}
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-12deg); }
+    50%      { transform: rotate(12deg); }
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+@st.cache_resource
 def load_artifacts():
     """Memuat model, scaler, daftar fitur, dan info akurasi dari file .pkl."""
-    model = joblib.load("model.pkl")                 
-    scaler = joblib.load("scaler.pkl")              
-    feature_columns = joblib.load("feature_columns.pkl")  
-    model_info = joblib.load("model_info.pkl")       
+    model = joblib.load("model.pkl")
+    scaler = joblib.load("scaler.pkl")
+    feature_columns = joblib.load("feature_columns.pkl")
+    model_info = joblib.load("model_info.pkl")
     return model, scaler, feature_columns, model_info
 model, scaler, feature_columns, model_info = load_artifacts()
 
 
-st.title("🍌 AI Student Burnout Risk Predictor")
+# Judul dengan emoji bergerak (memantul)
+st.markdown(
+    '<h1><span class="emoji-bounce">🎓</span> AI Student Burnout Risk Predictor '
+    '<span class="emoji-wiggle">🌈</span></h1>',
+    unsafe_allow_html=True
+)
 st.markdown(
     "Prediksi **risiko burnout** mahasiswa berdasarkan pola penggunaan "
     "AI generatif dan kebiasaan belajar. Final Project AI & Big Data 2026 Kelompok 3."
 )
 
 col_a, col_b = st.columns(2)
-col_a.metric("🍌 Model Terbaik", model_info["nama"])
-col_b.metric("🍌 Akurasi Model", f"{model_info['akurasi']*100:.1f}%")
+col_a.metric("🏆 Model Terbaik", model_info["nama"])
+col_b.metric("🎯 Akurasi Model", f"{model_info['akurasi']*100:.1f}%")
 
 st.divider()
 
-st.subheader("🍌 Masukkan Data Mahasiswa")
+st.subheader("📝 Masukkan Data Mahasiswa")
 
 c1, c2 = st.columns(2)
 
@@ -129,20 +190,20 @@ def build_feature_vector():
     return row
 
 
-if st.button("🍌 Prediksi Risiko Burnout", type="primary", use_container_width=True):
+if st.button("🔮 Prediksi Risiko Burnout", type="primary", use_container_width=True):
 
     X_input = build_feature_vector()
 
     X_scaled = scaler.transform(X_input)
 
-    pred = model.predict(X_scaled)[0]                  
-    proba = model.predict_proba(X_scaled)[0][1]       
+    pred = model.predict(X_scaled)[0]
+    proba = model.predict_proba(X_scaled)[0][1]
 
     st.divider()
-    st.subheader("🍌 Hasil Prediksi")
+    st.subheader("📊 Hasil Prediksi")
 
     if pred == 1:
-        st.error(f"🍌🍌 **RISIKO BURNOUT TINGGI**")
+        st.error("⚠️ **RISIKO BURNOUT TINGGI**")
         st.markdown(
             f"Model memperkirakan mahasiswa ini **berisiko tinggi** mengalami burnout "
             f"dengan probabilitas **{proba*100:.1f}%**."
@@ -153,7 +214,7 @@ if st.button("🍌 Prediksi Risiko Burnout", type="primary", use_container_width
             "atau layanan konseling kampus."
         )
     else:
-        st.success(f"✅ **RISIKO BURNOUT RENDAH / SEDANG**")
+        st.success("✅ **RISIKO BURNOUT RENDAH / SEDANG**")
         st.markdown(
             f"Model memperkirakan mahasiswa ini **tidak** berisiko burnout tinggi "
             f"(probabilitas burnout tinggi hanya **{proba*100:.1f}%**)."
