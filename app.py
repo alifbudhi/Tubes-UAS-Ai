@@ -6,32 +6,57 @@ import joblib
 
 st.set_page_config(
     page_title="AI Burnout Risk Predictor Kelompok 3",
-    page_icon="🌈",
+    page_icon="🍌",
     layout="centered",
 )
 
-# ===== BACKGROUND RAINBOW + EMOJI BERGERAK =====
+# ===== BACKGROUND RAINBOW KELAP-KELIP + EMOJI BERGERAK =====
 st.markdown("""
 <style>
-/* Latar belakang rainbow lembut yang bergerak halus */
+/* Latar belakang rainbow yang bergerak cepat (lebih meriah) */
 .stApp {
     background: linear-gradient(-45deg,
-        #ffd1dc, #ffe9c7, #fff7c2, #d4f5d4, #c7e9ff, #e0d1ff, #ffd1f0);
+        #ff5f6d, #ffc371, #fff75e, #44ff9a, #44b0ff, #8b5cff, #ff5fd2, #ff5f6d);
     background-size: 400% 400%;
-    animation: rainbowShift 18s ease infinite;
+    animation: rainbowShift 6s linear infinite;
 }
 @keyframes rainbowShift {
     0%   { background-position: 0% 50%; }
     50%  { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
+/* Lapisan kelap-kelip (twinkle) di atas background */
+.stApp::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+        radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+        radial-gradient(2px 2px at 60% 70%, #fff, transparent),
+        radial-gradient(3px 3px at 50% 20%, #fff, transparent),
+        radial-gradient(2px 2px at 80% 40%, #fff, transparent),
+        radial-gradient(2px 2px at 35% 80%, #fff, transparent),
+        radial-gradient(3px 3px at 90% 85%, #fff, transparent),
+        radial-gradient(2px 2px at 10% 60%, #fff, transparent);
+    background-size: 200% 200%;
+    animation: twinkle 2.2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+@keyframes twinkle {
+    0%, 100% { opacity: 0.15; }
+    50%      { opacity: 0.9; }
+}
 /* Panel gelap semi-transparan di belakang konten agar teks tetap terbaca */
 .stApp .block-container {
-    background: rgba(15, 23, 42, 0.80);
+    background: rgba(15, 23, 42, 0.82);
     padding: 2rem 2.5rem;
     border-radius: 18px;
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
 }
 /* Pastikan teks tetap terang di atas panel gelap */
 .stApp .block-container,
@@ -46,21 +71,32 @@ st.markdown("""
 /* Emoji yang memantul (bouncing) */
 .emoji-bounce {
     display: inline-block;
-    animation: bounce 1.2s ease infinite;
+    animation: bounce 1.0s ease infinite;
     font-size: 2.4rem;
 }
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-14px); }
+    50%      { transform: translateY(-16px); }
 }
 /* Emoji yang bergoyang (wiggle) */
 .emoji-wiggle {
     display: inline-block;
-    animation: wiggle 1.6s ease-in-out infinite;
+    animation: wiggle 1.2s ease-in-out infinite;
+    font-size: 2.4rem;
 }
 @keyframes wiggle {
-    0%, 100% { transform: rotate(-12deg); }
-    50%      { transform: rotate(12deg); }
+    0%, 100% { transform: rotate(-18deg); }
+    50%      { transform: rotate(18deg); }
+}
+/* Emoji pisang yang berputar pelan */
+.emoji-spin {
+    display: inline-block;
+    animation: spin 2.5s linear infinite;
+    font-size: 2.2rem;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -77,10 +113,14 @@ def load_artifacts():
 model, scaler, feature_columns, model_info = load_artifacts()
 
 
-# Judul dengan emoji bergerak (memantul)
+# Judul dengan emoji bergerak (pisang berputar + memantul + bergoyang)
 st.markdown(
-    '<h1><span class="emoji-bounce">🎓</span> AI Student Burnout Risk Predictor '
-    '<span class="emoji-wiggle">🌈</span></h1>',
+    '<h1>'
+    '<span class="emoji-spin">🍌</span> '
+    '<span class="emoji-bounce">🎓</span> AI Student Burnout Risk Predictor '
+    '<span class="emoji-wiggle">🌈</span> '
+    '<span class="emoji-spin">🍌</span>'
+    '</h1>',
     unsafe_allow_html=True
 )
 st.markdown(
@@ -89,12 +129,12 @@ st.markdown(
 )
 
 col_a, col_b = st.columns(2)
-col_a.metric("🏆 Model Terbaik", model_info["nama"])
-col_b.metric("🎯 Akurasi Model", f"{model_info['akurasi']*100:.1f}%")
+col_a.metric("🍌 Model Terbaik", model_info["nama"])
+col_b.metric("🍌 Akurasi Model", f"{model_info['akurasi']*100:.1f}%")
 
 st.divider()
 
-st.subheader("📝 Masukkan Data Mahasiswa")
+st.subheader("🍌 Masukkan Data Mahasiswa")
 
 c1, c2 = st.columns(2)
 
@@ -190,7 +230,7 @@ def build_feature_vector():
     return row
 
 
-if st.button("🔮 Prediksi Risiko Burnout", type="primary", use_container_width=True):
+if st.button("🍌 Prediksi Risiko Burnout", type="primary", use_container_width=True):
 
     X_input = build_feature_vector()
 
@@ -200,10 +240,10 @@ if st.button("🔮 Prediksi Risiko Burnout", type="primary", use_container_width
     proba = model.predict_proba(X_scaled)[0][1]
 
     st.divider()
-    st.subheader("📊 Hasil Prediksi")
+    st.subheader("🍌 Hasil Prediksi")
 
     if pred == 1:
-        st.error("⚠️ **RISIKO BURNOUT TINGGI**")
+        st.error("🍌🍌 **RISIKO BURNOUT TINGGI**")
         st.markdown(
             f"Model memperkirakan mahasiswa ini **berisiko tinggi** mengalami burnout "
             f"dengan probabilitas **{proba*100:.1f}%**."
